@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- ... (keep existing head, firebase imports, scripts) ... -->
+<!-- Keep existing script block -->
+    <script>
+        // --- 1. CONTACT FORM LOGIC ---
+        function handleContactSubmit(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const statusMsg = document.getElementById('statusMsg');
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value; 
+            const message = document.getElementById('message').value;
+
+            if(!name || !message) {
+                statusMsg.textContent = "Please fill in your name and message.";
+                statusMsg.className = "status-error";
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-envelope"></i> Opening Email...';
+
+            // Construct Mailto Link
+            const subject = encodeURIComponent(`Inquiry: Connectivity & Data Support Role - ${name}`);
+            const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
+            const mailtoLink = `mailto:prajaktalasanpure22@gmail.com?subject=${subject}&body=${body}`;
+
+            // Open Email Client
+            window.location.href = mailtoLink;
+
+            setTimeout(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Message';
+                statusMsg.textContent = "Email client opened! Please hit send in your mail app.";
+                statusMsg.className = "status-success";
+            }, 1000);
+        }
+
+        // --- 2. TYPING TEXT EFFECT ---
+        document.addEventListener('DOMContentLoaded', function() {
+            const textElement = document.getElementById('typing-text');
+            // UPDATED: Roles aligned with the JD
+            const roles = ["Technical Support", "Connectivity Specialist", "Data Analyst", "Solution Implementer"];
+            let roleIndex = 0;
+            let charIndex = 0;
+            let isDeleting = false;
+            let typeSpeed = 100;
+
+            function type() {
+                const currentRole = roles[roleIndex];
+                
+                if (isDeleting) {
+                    textElement.textContent = currentRole.substring(0, charIndex - 1);
+                    charIndex--;
+                    typeSpeed = 50; // Faster deleting
+                } else {
+                    textElement.textContent = currentRole.substring(0, charIndex + 1);
+                    charIndex++;
+                    typeSpeed = 100; // Normal typing
+                }
+
+                if (!isDeleting && charIndex === currentRole.length) {
+                    isDeleting = true;
+                    typeSpeed = 2000; // Pause at end
+                } else if (isDeleting && charIndex === 0) {
+                    isDeleting = false;
+                    roleIndex = (roleIndex + 1) % roles.length;
+                    typeSpeed = 500; // Pause before new word
+                }
+
+                setTimeout(type, typeSpeed);
+            }
+
+            type();
+        });
+    </script>
+
+    <style>
+        /* =========================================
+           1. CORE VARIABLES & RESET
+           ========================================= */
+        :root {
+            /* WARM EARTH/NUDE THEME */
+            --bg-exec: #faf8f6; /* Warm Cream */
+            --text-exec: #4a403a; /* Dark Coffee/Grey */
+            --sidebar-exec: linear-gradient(180deg, #3e322c 0%, #5c4b43 100%); /* Espresso Gradient */
+            --card-bg-exec: #ffffff;
+            --primary-accent: #b5836d; /* Rosy Brown / Terra Cotta */
+            
+            --trans-speed: 0.5s ease-in-out;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { font-size: 16px; scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-exec);
+            color: var(--text-exec);
+            line-height: 1.7; 
+            overflow-x: hidden;
+            transition: background-color var(--trans-speed);
+            -webkit-font-smoothing: antialiased; 
+            -moz-osx-font-smoothing: grayscale;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(181, 131, 109, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(166, 123, 91, 0.05) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        /* =========================================
+           2. LAYOUT
+           ========================================= */
+        
+        .app-container {
+            display: flex;
+            max-width: 1600px; 
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            background: var(--bg-exec);
+            box-shadow: 0 0 50px rgba(0,0,0,0.05);
+            z-index: 10;
+        }
+
+        .sidebar {
+            width: 320px;
+            background: var(--sidebar-exec);
+            color: #f8fafc;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            overflow-y: auto;
+            flex-shrink: 0;
+            padding: 3rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .profile-header { text-align: center; margin-bottom: 2rem; }
+        
+        .avatar-wrapper {
+            width: 150px; 
+            height: 150px; 
+            margin: 0 auto 1.5rem;
+            border-radius: 50%; 
+            padding: 4px; 
+            background: #fff;
+            box-shadow: 0 0 0 2px rgba(181, 131, 109, 0.3), 0 0 20px rgba(181, 131, 109, 0.4);
+            overflow: hidden; 
+        }
+        
+        .avatar-img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            /* SMART CROP: Centers on face */
+            object-position: 50% 15%; 
+            border-radius: 50%; 
+            filter: contrast(1.05) saturate(1.05); 
+        }
+        
+        .profile-name { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem; color: #fff; }
+        
+        /* Typing Effect Styles */
+        .profile-role { 
+            font-size: 0.95rem; color: #d6ccc2; font-weight: 400; margin-bottom: 1.5rem; 
+            min-height: 1.5em; /* Prevent layout jump */
+        }
+        .typing-cursor {
+            display: inline-block; width: 2px; height: 1em; background-color: var(--primary-accent);
+            animation: blink 1s infinite; vertical-align: middle; margin-left: 2px;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        .highlight-badge {
+            display: inline-flex; align-items: center; gap: 8px; background: rgba(181, 131, 109, 0.15); 
+            padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.8rem; font-weight: 500; border: 1px solid rgba(181, 131, 109, 0.3); color: #e6cbbf;
+        }
+
+        .nav-menu { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: auto; }
+        .nav-btn {
+            background: transparent; border: none; width: 100%; text-align: left; padding: 0.9rem 1rem; color: #d6ccc2;
+            font-size: 0.95rem; font-weight: 500; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.2s;
+        }
+        .nav-btn:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        .nav-btn.active { background: rgba(255,255,255,0.1); color: #fff; font-weight: 600; }
+        .nav-btn i { width: 20px; text-align: center; }
+        .nav-btn.active i { color: var(--primary-accent); }
+
+        /* DOWNLOAD BUTTON STYLE */
+        .download-btn {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            margin-top: 1rem; padding: 0.5rem 1rem; border-radius: 6px;
+            background: transparent; border: 1px solid rgba(255,255,255,0.3);
+            color: #d6ccc2; text-decoration: none; font-weight: 500; font-size: 0.85rem;
+            transition: 0.2s; width: 100%;
+        }
+        .download-btn:hover { background: rgba(255,255,255,0.1); color: #fff; border-color: #fff; }
+
+        .content-area { flex-grow: 1; padding: 4rem 5rem; }
+        
+        .tab-content { 
+            display: none; 
+            opacity: 0; 
+            animation: fadeIn 0.6s ease-out forwards; 
+            max-width: 1200px; 
+            width: 100%; 
+        }
+        .tab-content.active { display: block; opacity: 1; } 
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .card { 
+            background: #fff; border-radius: 16px; padding: 3.5rem; margin-bottom: 2.5rem; 
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; 
+            position: relative; overflow: hidden; 
+            transform: translateZ(0); /* Hardware Accel */
+            will-change: transform, box-shadow;
+        }
+        .card:hover { transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        
+        .card::before {
+            content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 16px; padding: 2px;
+            background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), rgba(181, 131, 109, 0.2), transparent 40%);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor; mask-composite: exclude; opacity: 0; transition: opacity 0.5s; pointer-events: none; z-index: 2;
+        }
+        .card:hover::before { opacity: 1; }
+
+        .section-title { font-family: 'Playfair Display', serif; font-size: 2rem; margin-bottom: 2.5rem; display: flex; align-items: center; gap: 1rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 1.5rem; color: #3e322c; }
+        .section-title i { color: var(--primary-accent); }
+        
+        .two-column-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+        
+        /* --- INTERACTIVE TIMELINE STYLING --- */
+        .timeline-container { 
+            position: relative; 
+            padding-left: 3rem; 
+            margin-top: 2rem;
+            padding-bottom: 15rem; 
+        }
+        
+        /* The Background Track */
+        .timeline-line-bg { 
+            position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: #e2e8f0; z-index: 1; 
+        }
+        
+        /* The Live Progress Line */
+        .timeline-line-progress { 
+            position: absolute; left: 0; top: 0; width: 2px; height: 100%; 
+            background: var(--primary-accent); z-index: 2; 
+            box-shadow: 0 0 10px rgba(181, 131, 109, 0.5);
+            transform-origin: top center; transform: scaleY(0); will-change: transform; 
+        }
+
+        /* Individual Nodes */
+        .timeline-node { 
+            position: relative; margin-bottom: 6rem; padding-left: 2rem; 
+            opacity: 0.5; transform: scale(0.98);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out; 
+            will-change: opacity, transform;
+        }
+        .timeline-node.active-node { opacity: 1; transform: scale(1.02); }
+
+        .node-header { display: flex; flex-direction: column; margin-bottom: 1rem; }
+        .node-role { font-size: 1.4rem; font-weight: 700; color: #3e322c; font-family: 'Playfair Display', serif; }
+        .node-meta { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; margin-top: 0.5rem; font-size: 0.95rem; color: var(--primary-accent); font-weight: 600; }
+        .node-time { color: #64748b; font-family: 'Inter', sans-serif; font-weight: 500; background: #e2e8f0; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; }
+
+        .node-content { font-size: 1rem; color: #475569; }
+        .node-section { margin-top: 1.5rem; }
+        .node-section h5 { 
+            font-size: 0.8rem; text-transform: uppercase; color: #94a3b8; 
+            margin-bottom: 0.75rem; letter-spacing: 1px; font-weight: 700;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .node-section h5::after { content: ''; flex-grow: 1; height: 1px; background: #e2e8f0; }
+        .node-list { list-style: none; padding: 0; }
+        .node-list li { position: relative; padding-left: 1.5rem; margin-bottom: 0.75rem; line-height: 1.6; }
+        .node-list li::before { content: '▹'; position: absolute; left: 0; color: var(--primary-accent); }
+
+        .tech-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.5rem; }
+        .tech-tag { 
+            font-size: 0.75rem; background: #ffffff; color: #475569; 
+            padding: 4px 12px; border-radius: 20px; font-weight: 600; border: 1px solid #e2e8f0; transition: 0.2s;
+        }
+        .timeline-node.active-node .tech-tag:hover { border-color: var(--primary-accent); color: var(--primary-accent); }
+
+        /* --- SKILLS SPEC SHEET STYLING --- */
+        .spec-card {
+            background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; padding: 2rem; transition: 0.3s;
+            height: 100%; display: flex; flex-direction: column; transform: translateZ(0);
+        }
+        .spec-card:hover { background: #fff; border-color: var(--primary-accent); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
+
+        .spec-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid #e2e8f0; }
+        .spec-icon { font-size: 1.5rem; color: var(--primary-accent); background: #fdf5f2; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 8px; }
+        .spec-title { font-size: 1.2rem; font-weight: 700; color: #3e322c; font-family: 'Playfair Display', serif; }
+        
+        .spec-list { display: flex; flex-direction: column; gap: 1.25rem; }
+        .spec-item { display: flex; flex-direction: column; gap: 0.25rem; }
+        .spec-name-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; font-weight: 600; color: #334155; }
+        .spec-bar-bg { height: 6px; width: 100%; background: #e2e8f0; border-radius: 3px; margin-top: 0.25rem; overflow: hidden; }
+        .spec-bar-fill { height: 100%; background: var(--primary-accent); border-radius: 3px; }
+        .spec-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.25rem; }
+        .spec-tag { font-size: 0.75rem; color: #64748b; background: #fff; border: 1px solid #cbd5e1; padding: 2px 8px; border-radius: 4px; }
+        
+        /* UPDATED ALIGNMENT FOR SKILLS LIST */
+        .spec-bullet-list { list-style: none; padding: 0; margin: 0; font-size: 0.9rem; color: #475569; }
+        .spec-bullet-list li { 
+            margin-bottom: 0.5rem; 
+            display: flex; 
+            align-items: flex-start; /* Aligns bullet with first line */
+            gap: 8px; 
+            line-height: 1.5; /* Improves readability for multi-line items */
+        }
+        .spec-bullet-list li::before { 
+            content: "•"; 
+            color: var(--primary-accent); 
+            font-weight: bold; 
+            flex-shrink: 0; /* Prevents bullet from shrinking */
+            margin-top: 2px; /* Slight optical adjustment */
+        }
+
+        /* PROJECT PORTFOLIO STYLING */
+        .project-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: 0.3s;
+            position: relative;
+        }
+        .project-card:hover {
+            border-color: var(--primary-accent);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1);
+        }
+        .project-badge { display: inline-block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; padding: 4px 12px; border-radius: 4px; margin-bottom: 1rem; background: #fdf5f2; color: var(--primary-accent); }
+        .project-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; color: #3e322c; margin-bottom: 1rem; }
+        .project-section { margin-bottom: 1rem; }
+        .project-label { font-size: 0.85rem; font-weight: 700; color: #64748b; text-transform: uppercase; display: block; margin-bottom: 0.25rem; }
+        .project-desc { font-size: 1rem; color: #475569; line-height: 1.6; }
+
+        /* PERSONALITY STYLES */
+        .persona-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem; }
+        .persona-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 2rem; transition: 0.3s; height: 100%; display: flex; flex-direction: column; }
+        .persona-card:hover { background: #fff; border-color: var(--primary-accent); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .persona-icon { font-size: 2rem; color: var(--primary-accent); margin-bottom: 1rem; }
+        .persona-title { font-size: 1.1rem; font-weight: 700; color: #3e322c; margin-bottom: 0.5rem; font-family: 'Playfair Display', serif; }
+        .persona-text { font-size: 0.95rem; color: #64748b; line-height: 1.6; margin-bottom: 1rem; }
+        .persona-params { margin-top: auto; padding-top: 1rem; border-top: 1px dashed #e2e8f0; display: flex; flex-direction: column; gap: 0.5rem; }
+        .param-row { display: flex; justify-content: space-between; font-size: 0.8rem; color: #475569; }
+        .param-val { font-weight: 600; color: var(--primary-accent); }
+
+        .content-body p { text-align: justify; text-justify: inter-word; margin-bottom: 1.5rem; font-size: 1.05rem; color: #475569; }
+        .story-header { font-size: 1.4rem; font-weight: 600; color: var(--primary-accent); margin-top: 2.5rem; margin-bottom: 1rem; font-family: 'Playfair Display', serif; }
+        .contact-footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); }
+        .contact-row { display: flex; align-items: center; gap: 12px; font-size: 0.85rem; color: #d6ccc2; margin-bottom: 0.75rem; }
+
+        /* Form Styles */
+        .form-group { margin-bottom: 1.5rem; }
+        .form-label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-exec); }
+        .form-input { 
+            width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; 
+            font-family: inherit; font-size: 1rem; background: #f8fafc; transition: 0.3s;
+        }
+        .form-input:focus { outline: none; border-color: var(--primary-accent); background: #fff; box-shadow: 0 0 0 3px rgba(181, 131, 109, 0.1); }
+        .form-btn {
+            background: var(--primary-accent); color: white; border: none; padding: 12px 24px; 
+            border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.3s; font-size: 1rem;
+            display: inline-flex; align-items: center; gap: 8px;
+        }
+        .form-btn:hover { background: #966753; transform: translateY(-1px); }
+        .form-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+        
+        .status-success { color: #047857; background: #d1fae5; padding: 1rem; border-radius: 8px; margin-top: 1rem; display: block; border: 1px solid #a7f3d0; }
+        .status-error { color: #b91c1c; background: #fee2e2; padding: 1rem; border-radius: 8px; margin-top: 1rem; display: block; border: 1px solid #fecaca; }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .two-column-grid { grid-template-columns: 1fr; }
+            .persona-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 1024px) {
+            .app-container { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; position: relative; padding: 2rem 1.5rem; }
+            .content-area { padding: 2rem 1.5rem; }
+            .two-column-grid, .metrics-grid { grid-template-columns: 1fr; }
+            .contact-footer { display: none; }
+        }
+
+        /* --- COMPETENCY GRID STYLES (NEW CARD DESIGN) --- */
+        .competency-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .comp-card {
+            background: #fff;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--primary-accent);
+            transition: transform 0.3s ease;
+        }
+        
+        .comp-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+        
+        .comp-icon {
+            font-size: 1.5rem;
+            color: var(--primary-accent);
+            margin-bottom: 0.75rem;
+        }
+        
+        .comp-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #3e322c;
+            margin-bottom: 0.5rem;
+        }
+        
+        .comp-desc {
+            font-size: 0.85rem;
+            color: #64748b;
+            line-height: 1.5;
+        }
+        
+        @media (max-width: 600px) {
+            .competency-grid { grid-template-columns: 1fr; }
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+<!-- ... (sidebar and other content remain same) ... -->
+    <aside class="sidebar">
+        <div class="profile-header">
+            <div class="avatar-wrapper">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjggMTI4Ij48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjYjU4MzZkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGR5PSIuMWVtIiBmaWxsPSJ3aGl0ZSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iNjQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiPlBMPC90ZXh0Pjwvc3ZnPg==" 
+                     alt="Prajakta Lasanpure" 
+                     class="avatar-img">
+            </div>
+            <h1 class="profile-name">Prajakta Lasanpure</h1>
+            
+            <div class="profile-role">
+                <span id="typing-text"></span><span class="typing-cursor"></span>
+            </div>
+
+            <div class="highlight-badge">
+                <i class="fas fa-trophy"></i>
+                <span>Smart India Hackathon Winner</span>
+            </div>
+        </div>
+
+        <nav class="nav-menu">
+            <button class="nav-btn active" onclick="openTab(event, 'tab1')"><i class="fas fa-book-open"></i> My Story</button>
+            <button class="nav-btn" onclick="openTab(event, 'tab3')"><i class="fas fa-road"></i> Career Timeline</button>
+            <button class="nav-btn" onclick="openTab(event, 'tab-projects')"><i class="fas fa-rocket"></i> Project Portfolio</button>
+            <button class="nav-btn" onclick="openTab(event, 'tab4')"><i class="fas fa-tools"></i> Skills Matrix</button>
+            <button class="nav-btn" onclick="openTab(event, 'tab6')"><i class="fas fa-user"></i> Personality</button>
+            <button class="nav-btn" onclick="openTab(event, 'tab-contact')"><i class="fas fa-paper-plane"></i> Contact Me</button>
+        </nav>
+
+        <div class="contact-footer">
+            <div class="contact-row"><i class="fas fa-envelope"></i> prajaktalasanpure22@gmail.com</div>
+            <div class="contact-row"><i class="fas fa-map-marker-alt"></i> Columbia, SC, USA</div>
+            <div class="contact-row"><i class="fab fa-linkedin"></i> linkedin.com/in/prajaktal</div>
+            <a href="Prajakta Lasanpure - Resume.pdf" download class="download-btn">
+                <i class="fas fa-download"></i> Download Resume
+            </a>
+        </div>
+    </aside>
+
+    <main class="content-area">
+        <!-- TAB 1: STORY -->
+        <div id="tab1" class="tab-content active">
+            <div class="card">
+                <h2 class="section-title"><i class="fas fa-book-reader"></i> The Professional Narrative</h2>
+                
+                <div class="content-body">
+                    <div class="story-header">I. The Foundation: A Personal Mission</div>
+                    <p>
+                        Growing up, I watched my mother work tirelessly in the healthcare industry. Witnessing the daily challenges patients faced, I identified a critical gap in Medical Emergency Services—especially in a country like India where timely access can be a matter of life and death. I knew throughout my childhood that I had to do something to solve these systemic problems. When I finally had the chance to apply my engineering knowledge, I saw it as the perfect platform to showcase a real solution to the issues I had observed for years. This mission became <strong>"Hospital Finder."</strong> Winning the <strong>Smart India Hackathon</strong> was the cherry on top; it was the validation I needed to realize I had to go deeper. That moment pushed me to pursue my Master’s in Computer Science and strive for excellence in this field.
+                    </p>
+
+                    <div class="story-header">II. The Crucible: Customer Support & Connectivity</div>
+                    <p>
+                        At Cloud Software Group, I operated at the frontline of technical support, assisting over 200 customers with complex data virtualization and connectivity issues. I diagnosed network bottlenecks, resolved protocol errors, and ensured seamless data flow. This role honed my ability to <strong>troubleshoot under pressure</strong> and communicate technical resolutions clearly to dealers and internal representatives.
+                    </p>
+
+                    <div class="story-header">III. The Evolution: From Support to Strategy</div>
+                    <p>
+                        While troubleshooting critical connectivity issues, I noticed a recurring pattern: many "technical" failures were actually rooted in undefined business requirements or misaligned data strategies. I realized I didn't want to just fix systems when they broke; I wanted to ensure they were designed correctly from the start. This drove my transition from Support Engineer to <strong>Business Analyst</strong>. I moved upstream to define the "what" and "why" before the "how"—using my deep technical background to translate complex business needs into precise, executable data requirements that prevent issues before deployment.
+                    </p>
+
+                    <div class="story-header">IV. The Philosophy</div>
+                    <p>
+                        <strong>"Customer Success through Technical Precision."</strong> Whether I am supporting a dealer with an equipment upgrade or analyzing connectivity data, my goal is the same: to identify the root cause, implement a robust solution, and ensure the stakeholder has the data they need to succeed.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: CAREER (Grapher Timeline - Clean Trace) -->
+        <div id="tab3" class="tab-content">
+            <div class="card">
+                <h2 class="section-title"><i class="fas fa-road"></i> Career Timeline</h2>
+                
+                <div class="timeline-container">
+                    <div class="timeline-line-bg"></div>
+                    <div class="timeline-line-progress" id="scroll-line"></div>
+
+                    <!-- Node 1: Current Job -->
+                    <div class="timeline-node">
+                        <div class="node-header">
+                            <span class="node-time">April '24 - Present</span>
+                            <span class="node-role">Business Analyst III (Data Systems & Engineering)</span>
+                            <span class="node-meta">South Carolina Department of Public Health | Columbia, SC</span>
+                        </div>
+                        <div class="node-content">
+                            <p>Focused on architecting data systems and managing complex datasets to bridge the gap between public health operations and engineering execution.</p>
+                            <div class="node-section">
+                                <h5>Key Contributions</h5>
+                                <ul class="node-list">
+                                    <li><strong>System Building & Data Handling:</strong> Designing and managing robust data workflows using <strong>SQL</strong> and <strong>R</strong> to ensure data integrity and system reliability.</li>
+                                    <li><strong>Engineering Collaboration:</strong> Acting as the technical liaison for engineering teams, translating raw data requirements into deployable system features with a 98% on-time delivery rate.</li>
+                                    <li><strong>Visualization & Intelligence:</strong> Developing advanced dashboards in <strong>Power BI</strong> and <strong>Excel</strong> to transform complex health data into actionable insights for decision-makers.</li>
+                                    <li><strong>Technical Optimization:</strong> Streamlining data handling processes to improve system efficiency by 25%, directly supporting the development lifecycle.</li>
+                                </ul>
+                            </div>
+                            <div class="tech-tags">
+                                <span class="tech-tag">SQL</span>
+                                <span class="tech-tag">Power BI</span>
+                                <span class="tech-tag">R Language</span>
+                                <span class="tech-tag">Excel</span>
+                                <span class="tech-tag">System Design</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Node 2: Cloud Software Group -->
+                    <div class="timeline-node">
+                        <div class="node-header">
+                            <span class="node-time">May '22 - Jan '24</span>
+                            <span class="node-role">Data Virtualization Engineer (Support & Connectivity)</span>
+                            <span class="node-meta">Cloud Software Group INC | North Carolina</span>
+                        </div>
+                        <div class="node-content">
+                            <p>Served as the primary technical support contact for connectivity and data access solutions.</p>
+                            <div class="node-section">
+                                <h5>Key Contributions</h5>
+                                <ul class="node-list">
+                                    <li><strong>Customer Support & Diagnostics:</strong> Supported 200+ cases with a 4.8/5.0 CSAT. Utilized OS/App log analysis, <strong>Wireshark</strong>, and <strong>Fiddler</strong> to debug network connectivity for TIBCO Data Virtualization.</li>
+                                    <li><strong>API Automation & Performance:</strong> Established RESTful APIs on TDV and rigorously tested with <strong>Postman</strong>, driving a 30% increase in issue detection efficiency and ensuring optimal cluster performance.</li>
+                                    <li><strong>Connector Validation:</strong> Conducted regression testing on TDV connectors to ensure stability and cross-platform compatibility with JDBC/ODBC drivers (PostgreSQL, Spotfire).</li>
+                                    <li><strong>Pipeline Optimization:</strong> Modified pipelines to increase fetch efficiency by 15% using complex SQL and deployed solutions on <strong>Kubernetes</strong>.</li>
+                                    <li><strong>Database Implementation:</strong> Designed 100+ database objects (procedures, functions) spanning SQL Server, Oracle, MongoDB, Spark, and Snowflake.</li>
+                                </ul>
+                            </div>
+                            <div class="tech-tags">
+                                <span class="tech-tag">Wireshark/Fiddler</span>
+                                <span class="tech-tag">REST APIs</span>
+                                <span class="tech-tag">Kubernetes</span>
+                                <span class="tech-tag">JDBC/ODBC</span>
+                                <span class="tech-tag">SQL Tuning</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Node 3: TRIO -->
+                    <div class="timeline-node">
+                        <div class="node-header">
+                            <span class="node-time">Jan '22 - May '22</span>
+                            <span class="node-role">Graduate Research Assistant</span>
+                            <span class="node-meta">TRIO Student Support Services | Kansas</span>
+                        </div>
+                        <div class="node-content">
+                            <p>Managed data capture and system testing for student information systems.</p>
+                            <div class="node-section">
+                                <ul class="node-list">
+                                    <li><strong>Data Capture:</strong> Automated the collection and processing of log events from multiple data sources.</li>
+                                    <li><strong>Database Testing:</strong> Tested SQL and NoSQL database solutions to ensure accurate data tracking.</li>
+                                </ul>
+                            </div>
+                            <div class="tech-tags">
+                                <span class="tech-tag">NoSQL</span>
+                                <span class="tech-tag">Distributed Systems</span>
+                                <span class="tech-tag">Log Processing</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Node 4: NetApp -->
+                    <div class="timeline-node">
+                        <div class="node-header">
+                            <span class="node-time">June '21 - Dec '21</span>
+                            <span class="node-role">Test Engineer</span>
+                            <span class="node-meta">NetApp (Workforce Logiq) | Kansas</span>
+                        </div>
+                        <div class="node-content">
+                            <p>Executed quality assurance and validation for inventory management software.</p>
+                            <div class="node-section">
+                                <ul class="node-list">
+                                    <li><strong>Technical Validation:</strong> Structured and executed test cases to validate host software features.</li>
+                                    <li><strong>Frontend Integration:</strong> Applied UI/UX concepts to integrate frontend interfaces with APIs.</li>
+                                </ul>
+                            </div>
+                            <div class="tech-tags">
+                                <span class="tech-tag">QA Testing</span>
+                                <span class="tech-tag">ReactJS</span>
+                                <span class="tech-tag">Documentation</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Education Nodes -->
+                    <div class="timeline-node">
+                        <div class="node-header">
+                            <span class="node-time">May '25 - Present</span>
+                            <span class="node-role">Executive M.S. in Project Management</span>
+                            <span class="node-meta">Tennessee Wesleyan University</span>
+                        </div>
+                        <div class="node-content">
+                             <span class="tech-tags">GPA: 3.4/4.0</span>
+                        </div>
+                    </div>
+
+                    <div class="timeline-node">
+                        <div class="node-header">
+                            <span class="node-time">Aug '20 - May '22</span>
+                            <span class="node-role">M.S. in Computer Science Engineering</span>
+                            <span class="node-meta">Wichita State University</span>
+                        </div>
+                        <div class="node-content">
+                             <span class="tech-tags">GPA: 3.4/4.0</span>
+                        </div>
+                    </div>
+
+                    <div class="timeline-node">
+                        <div class="node-header">
+                            <span class="node-time">Aug '16 - July '20</span>
+                            <span class="node-role">B.Tech in Information Technology</span>
+                            <span class="node-meta">MIT Academy of Engineering</span>
+                        </div>
+                        <div class="node-content">
+                            <span class="tech-tags">GPA: 4.0/4.0</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB PROJECTS: PROJECT PORTFOLIO -->
+        <div id="tab-projects" class="tab-content">
+            <div class="card">
+                <h2 class="section-title"><i class="fas fa-rocket"></i> Project Portfolio (STAR Analysis)</h2>
+                
+                <div class="timeline-container">
+                    <div class="timeline-line-bg"></div>
+                    <div class="timeline-line-progress" id="scroll-line-projects"></div>
+
+                    <!-- Project 1: CLIA Labs (CURRENT JOB) -->
+                    <div class="timeline-node">
+                        <div class="node-header">
+                            <span class="node-role">CLIA Labs Survey Tracking & Scheduling Optimization</span>
+                            <span class="node-meta">Public Health Operations (CMS/IQIES)</span>
+                        </div>
+                        <div class="node-content">
+                            <ul class="node-list" style="margin-top:1rem;">
+                                <li><strong style="color:var(--primary-accent)">Situation:</strong> Scheduling compliance surveys relied on static reports (CMS 850D) that lacked the "true last survey date," forcing manual lookups and increasing the risk of missed deadlines.</li>
+                                <li><strong style="color:var(--primary-accent)">Task:</strong> Build a unified tracking system to compile all CLIA labs, validate critical date fields, and support 0–18 month workload forecasting.</li>
+                                <li><strong style="color:var(--primary-accent)">Action:</strong> Designed a master tracking dataset merging system exports with manual verification. Built data validation rules (deduplication, date logic checks) and created a planning layer to group labs by due timeframe.</li>
+                                <li><strong style="color:var(--primary-accent)">Result:</strong> Delivered a reliable "single source of truth" tracker, reducing manual lookup time by ~40% and improving "last survey date" completeness from ~60% to 98%, enabling accurate compliance prioritization.</li>
+                            </ul>
+                            <div class="tech-tags">
+                                <span class="tech-tag">Data Validation</span>
+                                <span class="tech-tag">Workload Forecasting</span>
+                                <span class="tech-tag">Process Optimization</span>
+                                <span class="tech-tag">Compliance Reporting</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project 2: Complaints System (CURRENT JOB) -->
+                    <div class="timeline-node">
+                        <div class="node-header">
+                            <span class="node-role">New Complaints System: Export Validation & UAT Analytics</span>
+                            <span class="node-meta">System Modernization & Launch Readiness</span>
+                        </div>
+                        <div class="node-content">
+                            <ul class="node-list" style="margin-top:1rem;">
+                                <li><strong style="color:var(--primary-accent)">Situation:</strong> A new complaints platform rollout faced risks regarding "Accidents & Incidents" (A&I) data accuracy. Export errors could lead to compliance failures and reporting rework.</li>
+                                <li><strong style="color:var(--primary-accent)">Task:</strong> Establish a measurable UAT approach and validate A&I data exports for accuracy, completeness, and logic consistency before go-live.</li>
+                                <li><strong style="color:var(--primary-accent)">Action:</strong> Created structured UAT scripts and defined validation checks (row counts, null values, status logic). Implemented a defect tracking model (severity, aging) to quantify launch readiness.</li>
+                                <li><strong style="color:var(--primary-accent)">Result:</strong> Prevented "quiet data failures" by identifying critical export bugs pre-launch. Reduced defect backlog by 30% through clear reproduction steps and provided stakeholders with data-driven confidence for go-live.</li>
+                            </ul>
+                            <div class="tech-tags">
+                                <span class="tech-tag">UAT Coordination</span>
+                                <span class="tech-tag">Data Quality QA</span>
+                                <span class="tech-tag">Defect Tracking</span>
+                                <span class="tech-tag">Launch Readiness</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project 3: STAR PROJECT (IEEE Paper) -->
+                    <div class="timeline-node">
+                        <div class="node-header">
+                            <span class="node-role">Intelligent Fleet & Traffic Connectivity</span>
+                            <span class="node-meta">Research Project (Python/AWS)</span>
+                        </div>
+                        <div class="node-content">
+                            <ul class="node-list" style="margin-top:1rem;">
+                                <li><strong style="color:var(--primary-accent)">Situation:</strong> Urban traffic congestion and fleet management lacked real-time, automated data inputs for efficient control.</li>
+                                <li><strong style="color:var(--primary-accent)">Task:</strong> Design a dynamic system using computer vision to detect vehicle density and optimize traffic flow logic.</li>
+                                <li><strong style="color:var(--primary-accent)">Action:</strong> Implemented <strong>Mask R-CNN models</strong> using Python 3.6 on <strong>AWS infrastructure</strong> to process video feeds and generate real-time fleet data.</li>
+                                <li><strong style="color:var(--primary-accent)">Result:</strong> Published as an <strong>IEEE Conference Paper</strong> <em>("Smart Traffic Dynamic Manipulation System Using Vehicle Density")</em>, validating the model's accuracy for smart city connectivity.</li>
+                            </ul>
+                            <div class="tech-tags">
+                                <span class="tech-tag">Computer Vision</span>
+                                <span class="tech-tag">IEEE Published</span>
+                                <span class="tech-tag">AWS</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project 4: SERVE ROBOTICS -->
+                    <div class="timeline-node">
+                        <div class="node-header">
+                            <span class="node-role">Autonomous Delivery Financial Strategy (Serve Robotics)</span>
+                            <span class="node-meta">Financial Analysis & Market Expansion</span>
+                        </div>
+                        <div class="node-content">
+                            <ul class="node-list" style="margin-top:1rem;">
+                                <li><strong style="color:var(--primary-accent)">Situation:</strong> The $185B last-mile delivery sector faced high operational costs and inefficiency.</li>
+                                <li><strong style="color:var(--primary-accent)">Task:</strong> Analyze financial viability and strategic scaling roadmap for autonomous delivery fleet.</li>
+                                <li><strong style="color:var(--primary-accent)">Action:</strong> Evaluated KPIs including <strong>773% YoY revenue growth</strong> and a <strong>$259M financing strategy</strong>. Analyzed unit economics of 2,000 zero-emission robots.</li>
+                                <li><strong style="color:var(--primary-accent)">Result:</strong> Defined a strategic growth trajectory targeting <strong>150% quarterly revenue increases</strong>, validating the business case for robotic logistics.</li>
+                            </ul>
+                            <div class="tech-tags">
+                                <span class="tech-tag">Financial Analysis</span>
+                                <span class="tech-tag">Revenue Modeling</span>
+                                <span class="tech-tag">Strategic Partnerships</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project 5: Hospital Finder -->
+                    <div class="timeline-node">
+                        <div class="node-header">
+                            <span class="node-role">Hospital Finder (Digital Solution Implementation)</span>
+                            <span class="node-meta">Smart India Hackathon Winner</span>
+                        </div>
+                        <div class="node-content">
+                            <ul class="node-list" style="margin-top:1rem;">
+                                <li><strong style="color:var(--primary-accent)">Situation:</strong> Inefficient access to emergency medical resource information created critical delays for patients.</li>
+                                <li><strong style="color:var(--primary-accent)">Task:</strong> Build a scalable, user-friendly connectivity platform to locate hospitals instantly.</li>
+                                <li><strong style="color:var(--primary-accent)">Action:</strong> Architected a full-stack solution using Android/Web interfaces and <strong>Google Maps API</strong> for real-time data.</li>
+                                <li><strong style="color:var(--primary-accent)">Result:</strong> Secured <strong>Rank 1 (National Winner)</strong> in 'Complex Category' at Smart India Hackathon 2019.</li>
+                            </ul>
+                            <div class="tech-tags">
+                                <span class="tech-tag">Android/Web</span>
+                                <span class="tech-tag">Google API</span>
+                                <span class="tech-tag">Implementation</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        
+        <!-- TAB 4: SKILLS MATRIX -->
+        <div id="tab4" class="tab-content">
+            <div class="card">
+                <h2 class="section-title"><i class="fas fa-tools"></i> Skills Matrix</h2>
+                
+                <div class="two-column-grid">
+                    
+                    <!-- Card 1: Data Strategy & Analytics -->
+                    <div class="spec-card">
+                        <div class="spec-header">
+                            <div class="spec-icon"><i class="fas fa-chart-line"></i></div>
+                            <div class="spec-title">Data Strategy & Analytics</div>
+                        </div>
+                        
+                        <div class="spec-list">
+                            <div class="spec-item">
+                                <div class="spec-name-row">
+                                    <span>Visualization & Reporting</span>
+                                    <span>Advanced</span>
+                                </div>
+                                <div class="spec-bar-bg"><div class="spec-bar-fill" style="width: 90%;"></div></div>
+                                <div class="spec-tags">
+                                    <span class="spec-tag">Power BI</span>
+                                    <span class="spec-tag">Tableau</span>
+                                    <span class="spec-tag">Spotfire</span>
+                                    <span class="spec-tag">Excel (Advanced)</span>
+                                </div>
+                            </div>
+                            
+                            <div class="spec-item">
+                                <div class="spec-name-row">
+                                    <span>Data Management</span>
+                                    <span>Advanced</span>
+                                </div>
+                                <div class="spec-bar-bg"><div class="spec-bar-fill" style="width: 85%;"></div></div>
+                                <div class="spec-tags">
+                                    <span class="spec-tag">SQL</span>
+                                    <span class="spec-tag">Snowflake</span>
+                                    <span class="spec-tag">Databricks</span>
+                                    <span class="spec-tag">Oracle</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Card 2: Technical & Connectivity -->
+                    <div class="spec-card">
+                        <div class="spec-header">
+                            <div class="spec-icon"><i class="fas fa-network-wired"></i></div>
+                            <div class="spec-title">Technical & Connectivity</div>
+                        </div>
+                        
+                        <div class="spec-list">
+                            <div class="spec-item">
+                                <div class="spec-name-row">
+                                    <span>Network Diagnostics</span>
+                                    <span>Advanced</span>
+                                </div>
+                                <div class="spec-bar-bg"><div class="spec-bar-fill" style="width: 90%;"></div></div>
+                                <div class="spec-tags">
+                                    <span class="spec-tag">Wireshark</span>
+                                    <span class="spec-tag">Fiddler</span>
+                                    <span class="spec-tag">Postman</span>
+                                    <span class="spec-tag">REST APIs</span>
+                                </div>
+                            </div>
+                            
+                            <div class="spec-item">
+                                <div class="spec-name-row">
+                                    <span>Programming & Scripting</span>
+                                    <span>Intermediate</span>
+                                </div>
+                                <div class="spec-bar-bg"><div class="spec-bar-fill" style="width: 75%;"></div></div>
+                                <div class="spec-tags">
+                                    <span class="spec-tag">Python</span>
+                                    <span class="spec-tag">R Language</span>
+                                    <span class="spec-tag">Unix Shell</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="two-column-grid" style="margin-top: 2rem;">
+                    <!-- Card 3: Business & Process Management -->
+                    <div class="spec-card">
+                        <div class="spec-header">
+                            <div class="spec-icon"><i class="fas fa-tasks"></i></div>
+                            <div class="spec-title">Business & Process Management</div>
+                        </div>
+                        
+                        <div class="spec-list">
+                            <ul class="spec-bullet-list">
+                                <li>
+                                    <div><strong>Requirement Translation:</strong> Bridging the gap between operational needs and engineering deliverables (Improved requirement-gathering efficiency by 25%).</div>
+                                </li>
+                                <li>
+                                    <div><strong>SOP Development:</strong> Designing and revising Standard Operating Procedures for regulatory compliance and operational alignment.</div>
+                                </li>
+                                <li>
+                                    <div><strong>System Validation:</strong> Executing UAT and validating system features to ensure seamless integration (98% on-time delivery rate).</div>
+                                </li>
+                                <li>
+                                    <div><strong>Agile Methodology:</strong> Engineering Agile storyboards and increasing backlog clarity by 30% to align deliverables with business goals.</div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                     <!-- Card 4: Professional Competencies (Grid Layout) -->
+                     <div class="spec-card">
+                        <div class="spec-header">
+                            <div class="spec-icon"><i class="fas fa-users-cog"></i></div>
+                            <div class="spec-title">Professional Competencies</div>
+                        </div>
+                        
+                        <div class="competency-grid">
+                            <!-- Competency 1 -->
+                            <div class="comp-card">
+                                <div class="comp-icon"><i class="fas fa-brain"></i></div>
+                                <div class="comp-title">Critical Thinking & Decision Making</div>
+                                <div class="comp-desc">Analyzing complex technical situations to make informed, data-driven decisions that align with business goals.</div>
+                            </div>
+                            
+                            <!-- Competency 2 -->
+                            <div class="comp-card">
+                                <div class="comp-icon"><i class="fas fa-tools"></i></div>
+                                <div class="comp-title">Problem Solving & Implementation</div>
+                                <div class="comp-desc">Identifying root causes of issues and implementing robust technical solutions, supporting end users throughout deployment.</div>
+                            </div>
+                            
+                            <!-- Competency 3 -->
+                            <div class="comp-card">
+                                <div class="comp-icon"><i class="fas fa-headset"></i></div>
+                                <div class="comp-title">Customer Support Orientation</div>
+                                <div class="comp-desc">Proven experience supporting 200+ customers and stakeholders in a technical, solution-focused environment.</div>
+                            </div>
+                            
+                            <!-- Competency 4 -->
+                            <div class="comp-card">
+                                <div class="comp-icon"><i class="fas fa-comments"></i></div>
+                                <div class="comp-title">Technical Communication</div>
+                                <div class="comp-desc">Translating complex technical information (SQL, APIs, Protocols) into clear language for dealers and internal partners.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div id="tab6" class="tab-content">
+            <div class="card">
+                <h2 class="section-title"><i class="fas fa-user"></i> Professional Persona</h2>
+                
+                <div style="margin-bottom: 2rem;">
+                    <p>
+                        My professional identity is shaped by a unique convergence of <strong>engineering precision</strong>, <strong>business strategy</strong>, and a deep-seated commitment to <strong>social impact</strong>. I don't just execute tasks; I analyze the ecosystem they exist in.
+                    </p>
+                </div>
+
+                 <div class="competency-grid" style="grid-template-columns: repeat(3, 1fr);">
+                    
+                    <!-- Persona 1: The Translator -->
+                    <div class="comp-card">
+                        <div class="comp-icon"><i class="fas fa-exchange-alt"></i></div>
+                        <div class="comp-title">The Tech-Business Translator</div>
+                        <div class="comp-desc">
+                            <p style="margin-bottom:0.5rem;"><strong>"I speak both SQL and Strategy."</strong></p>
+                            <p>My background allows me to debug a network packet in Wireshark one moment and present a financial growth strategy to stakeholders the next. I bridge the gap between engineering's "how" and the business's "why," ensuring technical solutions actually drive operational success.</p>
+                        </div>
+                    </div>
+
+                    <!-- Persona 2: The Ethical Strategist -->
+                    <div class="comp-card">
+                        <div class="comp-icon"><i class="fas fa-balance-scale"></i></div>
+                        <div class="comp-title">The Ethical Strategist</div>
+                        <div class="comp-desc">
+                            <p style="margin-bottom:0.5rem;"><strong>"Efficiency without Ethics is a Risk."</strong></p>
+                            <p>Drawing from my analysis of algorithmic risks (Uber Case Study) and sustainable innovation (Serve Robotics), I approach every project with a long-term view. I focus on solutions that are not just profitable and scalable, but also ethical, transparent, and sustainable.</p>
+                        </div>
+                    </div>
+
+                    <!-- Persona 3: The Impact Architect -->
+                    <div class="comp-card">
+                        <div class="comp-icon"><i class="fas fa-heartbeat"></i></div>
+                        <div class="comp-title">The Impact Architect</div>
+                        <div class="comp-desc">
+                            <p style="margin-bottom:0.5rem;"><strong>"Data for the Public Good."</strong></p>
+                            <p>Whether it's routing traffic to reduce congestion or optimizing lab surveys for public health, I am driven by impact. My roots in observing the healthcare sector taught me that the best systems are the ones that solve tangible problems for real people.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- NEW TAB: CONTACT FORM -->
+        <div id="tab-contact" class="tab-content">
+            <div class="card">
+                <h2 class="section-title"><i class="fas fa-paper-plane"></i> Get In Touch</h2>
+                
+                <div class="two-column-grid">
+                    <div>
+                        <p style="margin-bottom:2rem;">
+                            I am interested in discussing how my background in connectivity troubleshooting, data reporting, and customer support can drive success for your mining technology operations.
+                        </p>
+                        
+                        <form id="contactForm" onsubmit="handleContactSubmit(event)">
+                            <div class="form-group">
+                                <label class="form-label" for="name">Full Name</label>
+                                <input type="text" id="name" class="form-input" required placeholder="John Doe">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="email">Email Address</label>
+                                <input type="email" id="email" class="form-input" required placeholder="john@example.com">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="message">Message</label>
+                                <textarea id="message" class="form-input" rows="5" required placeholder="Let's discuss connectivity solutions..."></textarea>
+                            </div>
+
+                            <button type="submit" id="submitBtn" class="form-btn">
+                                <i class="fas fa-paper-plane"></i> Send Message
+                            </button>
+                            
+                            <div id="statusMsg"></div>
+                        </form>
+                    </div>
+
+                    <div style="background:#f1f5f9; padding:2rem; border-radius:12px; height:fit-content;">
+                        <h3 style="font-family:'Playfair Display'; margin-bottom:1rem; font-size:1.4rem; color:var(--primary-accent);">Contact Details</h3>
+                        <div class="contact-row" style="margin-bottom:1rem; font-size:1rem; color:#4a403a;">
+                            <i class="fas fa-envelope" style="width:24px; color:var(--primary-accent);"></i> prajaktalasanpure22@gmail.com
+                        </div>
+                        <div class="contact-row" style="margin-bottom:1rem; font-size:1rem; color:#4a403a;">
+                            <i class="fas fa-phone" style="width:24px; color:var(--primary-accent);"></i> (316) 869-7846
+                        </div>
+                        <div class="contact-row" style="margin-bottom:1rem; font-size:1rem; color:#4a403a;">
+                            <i class="fab fa-linkedin" style="width:24px; color:var(--primary-accent);"></i> linkedin.com/in/prajaktal
+                        </div>
+                        <div class="contact-row" style="margin-bottom:1rem; font-size:1rem; color:#4a403a;">
+                            <i class="fas fa-map-marker-alt" style="width:24px; color:var(--primary-accent);"></i> Columbia, SC
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- SCRIPTS -->
+<script>
+    // Standard Tab Logic
+    function openTab(evt, tabName) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tab-content");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].classList.remove("active");
+            tabcontent[i].style.display = "none"; 
+        }
+        tablinks = document.getElementsByClassName("nav-btn");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].classList.remove("active");
+        }
+        
+        const selected = document.getElementById(tabName);
+        if(selected) {
+            selected.style.display = "block";
+            // Allow reflow for opacity transition
+            setTimeout(() => selected.classList.add("active"), 10);
+            
+            // Check for timelines
+            if(tabName === 'tab3' || tabName === 'tab-projects') {
+                setTimeout(() => initTimelineAnim(tabName), 50);
+            }
+        }
+        
+        evt.currentTarget.classList.add("active");
+    }
+
+    // Timeline Animation Logic (Shared)
+    let activeTimelineContainer = null;
+    let activeScrollLine = null;
+
+    function initTimelineAnim(tabName) {
+        // Reset
+        activeTimelineContainer = null;
+        activeScrollLine = null;
+
+        const tab = document.getElementById(tabName);
+        if(tab) {
+            activeTimelineContainer = tab.querySelector('.timeline-container');
+            activeScrollLine = tab.querySelector('.timeline-line-progress');
+            if(activeTimelineContainer) {
+                updateTimeline(); // Initial draw
+            }
+        }
+    }
+
+    function updateTimeline() {
+        if(!activeTimelineContainer) return;
+        
+        const nodes = activeTimelineContainer.querySelectorAll('.timeline-node');
+        const containerRect = activeTimelineContainer.getBoundingClientRect();
+        
+        // Reading Line ~35% down viewport
+        const readY = window.innerHeight * 0.35;
+        
+        // Calculate fill height
+        let height = readY - containerRect.top;
+        if(height < 0) height = 0;
+        if(height > containerRect.height) height = containerRect.height;
+        
+        if(activeScrollLine) {
+            activeScrollLine.style.height = height + 'px';
+        }
+
+        // Active State Logic
+        nodes.forEach(node => {
+            const rect = node.getBoundingClientRect();
+            
+            if (rect.top <= readY + 100) { 
+                node.classList.add('active-node');
+                node.style.opacity = '1';
+                node.style.transform = 'scale(1.02)';
+            } else {
+                node.classList.remove('active-node');
+                node.style.opacity = '0.5';
+                node.style.transform = 'scale(0.98)';
+            }
+        });
+    }
+
+    window.addEventListener('scroll', () => {
+        requestAnimationFrame(updateTimeline);
+    });
+</script>
+
+</body>
+</html>
