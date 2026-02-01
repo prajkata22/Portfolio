@@ -448,13 +448,17 @@
 <body>
 
 <div class="app-container">
-<!-- ... (sidebar and other content remain same) ... -->
     <aside class="sidebar">
         <div class="profile-header">
             <div class="avatar-wrapper">
-                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjggMTI4Ij48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjYjU4MzZkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGR5PSIuMWVtIiBmaWxsPSJ3aGl0ZSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iNjQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiPlBMPC90ZXh0Pjwvc3ZnPg==" 
+                <!-- 
+                     UPDATED IMAGE REFERENCE: "Profile Photo.png"
+                     Ensure your file is named EXACTLY "Profile Photo.png" in your GitHub folder.
+                -->
+                <img src="Profile Photo.png" 
                      alt="Prajakta Lasanpure" 
-                     class="avatar-img">
+                     class="avatar-img" 
+                     onerror="this.src='https://ui-avatars.com/api/?name=Prajakta+Lasanpure&background=b5836d&color=fff&size=128'">
             </div>
             <h1 class="profile-name">Prajakta Lasanpure</h1>
             
@@ -940,47 +944,27 @@
         </div>
 
         <div id="tab6" class="tab-content">
+<!-- ... (Personality tab remains unchanged) ... -->
             <div class="card">
                 <h2 class="section-title"><i class="fas fa-user"></i> Professional Persona</h2>
-                
-                <div style="margin-bottom: 2rem;">
-                    <p>
-                        My professional identity is shaped by a unique convergence of <strong>engineering precision</strong>, <strong>business strategy</strong>, and a deep-seated commitment to <strong>social impact</strong>. I don't just execute tasks; I analyze the ecosystem they exist in.
-                    </p>
-                </div>
-
-                 <div class="competency-grid" style="grid-template-columns: repeat(3, 1fr);">
-                    
-                    <!-- Persona 1: The Translator -->
-                    <div class="comp-card">
-                        <div class="comp-icon"><i class="fas fa-exchange-alt"></i></div>
-                        <div class="comp-title">The Tech-Business Translator</div>
-                        <div class="comp-desc">
-                            <p style="margin-bottom:0.5rem;"><strong>"I speak both SQL and Strategy."</strong></p>
-                            <p>My background allows me to debug a network packet in Wireshark one moment and present a financial growth strategy to stakeholders the next. I bridge the gap between engineering's "how" and the business's "why," ensuring technical solutions actually drive operational success.</p>
-                        </div>
+                 <div class="persona-grid">
+                    <!-- Trait 1 -->
+                    <div class="persona-card">
+                        <div class="persona-icon"><i class="fas fa-headset"></i></div>
+                        <h3 class="persona-title">The Troubleshooter</h3>
+                        <p class="persona-text">
+                            I thrive on being the primary contact for technical issues. Whether it's a dealer facing a connectivity upgrade hurdle or an internal data discrepancy, I proactively identify and resolve the root cause.
+                        </p>
                     </div>
 
-                    <!-- Persona 2: The Ethical Strategist -->
-                    <div class="comp-card">
-                        <div class="comp-icon"><i class="fas fa-balance-scale"></i></div>
-                        <div class="comp-title">The Ethical Strategist</div>
-                        <div class="comp-desc">
-                            <p style="margin-bottom:0.5rem;"><strong>"Efficiency without Ethics is a Risk."</strong></p>
-                            <p>Drawing from my analysis of algorithmic risks (Uber Case Study) and sustainable innovation (Serve Robotics), I approach every project with a long-term view. I focus on solutions that are not just profitable and scalable, but also ethical, transparent, and sustainable.</p>
-                        </div>
+                    <!-- Trait 2 -->
+                    <div class="persona-card">
+                        <div class="persona-icon"><i class="fas fa-comments"></i></div>
+                        <h3 class="persona-title">The Communicator</h3>
+                        <p class="persona-text">
+                            I specialize in "Clear Technical Communication." I translate complex data and connectivity concepts into clear, actionable information for non-technical stakeholders and dealers.
+                        </p>
                     </div>
-
-                    <!-- Persona 3: The Impact Architect -->
-                    <div class="comp-card">
-                        <div class="comp-icon"><i class="fas fa-heartbeat"></i></div>
-                        <div class="comp-title">The Impact Architect</div>
-                        <div class="comp-desc">
-                            <p style="margin-bottom:0.5rem;"><strong>"Data for the Public Good."</strong></p>
-                            <p>Whether it's routing traffic to reduce congestion or optimizing lab surveys for public health, I am driven by impact. My roots in observing the healthcare sector taught me that the best systems are the ones that solve tangible problems for real people.</p>
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </div>
